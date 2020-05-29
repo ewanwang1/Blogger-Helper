@@ -8,7 +8,7 @@ const ejs = require("ejs");
 
 const homeStartingContent = "Welcome to my blog";
 const aboutContent = `Hi. My name is Ewan. I am a 3rd year Computer Science student at UBC. I built this blog webapp for creators to update their blog posts without knowing any code.
-                      To add a new blog post, all you have to do is to add /compose to the home url to access the edit page. Then you can add your blog post !!`
+                      Feel free to add and delete posts, just make you keep them appropriate.`
 
 
 const contactContent = "My email is wang95098@gmail.com. I am open to coop and internships. Feel free to contact me if you see room for us to work together or just wanna say hi.";
@@ -29,13 +29,15 @@ const _ = require('lodash');
 
 
 
-var posts = [];
 
+var posts = [];
+var errorMsg = '';
 
 
 
 app.get("/", function (req, res) {
-  res.render("home", { startingContent: homeStartingContent, posts: posts });
+  res.render("home", { startingContent: homeStartingContent, posts: posts, errorMsg: errorMsg});
+  errorMsg = '';
 })
 
 app.get("/about", function (req, res) {
@@ -52,11 +54,23 @@ app.get("/compose", function (req, res) {
 })
 
 app.post("/compose", function (req, res) {
-  const post = {
-    title: req.body.postTitle,
-    body: req.body.postBody
-  };
-  posts.push(post);
+  // handle deletePost
+  if (req.body.postTitle == null) {
+    posts.forEach(function (post) {
+      if (post.title == req.body.postToDelete) {
+        const index = posts.indexOf(post);
+        posts.splice(index,1);
+      } else {
+        errorMsg = "Sorry the post you ask to be deleted cannot be found. Please try again";
+      }
+    })
+  }else{
+    const post = {
+      title: req.body.postTitle,
+      body: req.body.postBody
+    };
+    posts.push(post);
+  }
   res.redirect("/");
 })
 
@@ -69,7 +83,7 @@ app.get("/posts/:postTitle", function (req, res) {
     const storedTitle = _.lowerCase(post.title);
     if (storedTitle === requestedTitle) {
       res.render("post", { requestedPost: post });
-    } 
+    }
   })
 
 })
