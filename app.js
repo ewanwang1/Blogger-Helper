@@ -26,18 +26,13 @@ const _ = require('lodash');
 
 
 
-
-
-
-
 var posts = [];
 var errorMsg = '';
 
 
 
 app.get("/", function (req, res) {
-  res.render("home", { startingContent: homeStartingContent, posts: posts, errorMsg: errorMsg});
-  errorMsg = '';
+  res.render("home", { startingContent: homeStartingContent, posts: posts});
 })
 
 app.get("/about", function (req, res) {
